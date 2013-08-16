@@ -3,6 +3,11 @@
 This language is an extension of Expressions. This was an assignment for the course 
 Programming language Concepts and Implementations at ITU. 
 
+If you want to run it, type for example:
+
+Expression.exe exMod.txt compile
+Machine.exe a.out
+
 **Expressions** is an educational tool for teaching lexers, parsers, and compilers used at the IT University of Copenhagen.
 
 The core of the project was built by Peter Sestoft.
