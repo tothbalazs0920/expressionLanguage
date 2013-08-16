@@ -1,5 +1,7 @@
 ﻿Expressions
 =======
+This language is an extension of Expressions. This was an assignment for the course 
+Programming language Concepts and Implementations at ITU. 
 
 **Expressions** is an educational tool for teaching lexers, parsers, and compilers used at the IT University of Copenhagen.
 
