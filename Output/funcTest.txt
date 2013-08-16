@@ -1,0 +1,2 @@
+int sub(int a, int b, int c, int d) = b-c;
+sub(1222, 14,3, 555)

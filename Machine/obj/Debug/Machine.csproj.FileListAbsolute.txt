@@ -1,0 +1,3 @@
+C:\Users\Balazs\Documents\Visual Studio 2012\Projects\Expressions\Output\Machine.exe
+C:\Users\Balazs\Documents\Visual Studio 2012\Projects\Expressions\Machine\obj\Debug\Machine.csprojResolveAssemblyReference.cache
+C:\Users\Balazs\Documents\Visual Studio 2012\Projects\Expressions\Machine\obj\Debug\Machine.exe

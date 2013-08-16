@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8937330D-836E-426B-90E6-446BC647E16F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Expressions</RootNamespace>
+    <AssemblyName>Expressions</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Output\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Output\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BinaryOperation.cs" />
+    <Compile Include="IfStatement.cs" />
+    <Compile Include="LetIn.cs" />
+    <Compile Include="System\Call.cs" />
+    <Compile Include="System\CompilationEnvironment.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="System\CstI.cs" />
+    <Compile Include="System\Expression.cs" />
+    <Compile Include="System\Return.cs" />
+    <Compile Include="System\FunctionEnvironment.cs" />
+    <Compile Include="FunctionCall.cs" />
+    <Compile Include="FunctionDefinition.cs" />
+    <Compile Include="System\Generator.cs" />
+    <Compile Include="System\Goto.cs" />
+    <Compile Include="System\IfNotZero.cs" />
+    <Compile Include="System\IfZero.cs" />
+    <Compile Include="System\IncSp.cs" />
+    <Compile Include="System\Instruction.cs" />
+    <Compile Include="System\IntegerArgumentInstruction.cs" />
+    <Compile Include="System\JumpInstruction.cs" />
+    <Compile Include="System\Label.cs" />
+    <Compile Include="System\MainProgram.cs" />
+    <Compile Include="System\Opcode.cs" />
+    <Compile Include="Operator.cs" />
+    <Compile Include="System\PrimitiveType.cs" />
+    <Compile Include="System\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\RuntimeEnvironment.cs" />
+    <Compile Include="System\SimpleInstruction.cs" />
+    <Compile Include="System\Storage.cs" />
+    <Compile Include="System\TCall.cs" />
+    <Compile Include="System\TypeCheckingEnvironment.cs" />
+    <Compile Include="System\Type.cs" />
+    <Compile Include="UnaryOperation.cs" />
+    <Compile Include="Variable.cs" />
+    <Compile Include="System\Scanner.cs" />
+    <Compile Include="System\Parser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Expressions.ATG" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <Target Name="BeforeBuild">
+    <Delete Files=".\System\Scanner.cs" Condition="Exists('.\System\Scanner.cs')" />
+    <Delete Files=".\System\Parser.cs" Condition="Exists('.\System\Parser.cs')" />
+    <Exec Command=".\System\Coco.exe Expressions.ATG -namespace Expressions -o .\System -frames .\System" />
+  </Target>
+</Project>

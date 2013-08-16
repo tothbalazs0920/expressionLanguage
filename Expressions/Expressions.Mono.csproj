@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3EA5D160-F23C-4AD6-9E00-0D62CCA1BA92}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Expressions</RootNamespace>
+    <AssemblyName>Expressions</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\Output</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>True</Externalconsole>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="[ -f System/Scanner.cs ] &amp;&amp; rm System/Scanner.cs" externalConsole="True" />
+        <Command type="BeforeBuild" command="[ -f System/Parser.cs ] &amp;&amp; rm System/Parser.cs" externalConsole="True" />
+        <Command type="BeforeBuild" command="mono System/Coco.exe Expressions.ATG -namespace Expressions -o System -frames System" externalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>..\Output</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>True</Externalconsole>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="[ -f System/Scanner.cs ] &amp;&amp; rm System/Scanner.cs" externalConsole="True" />
+        <Command type="BeforeBuild" command="[ -f System/Parser.cs ] &amp;&amp; rm System/Parser.cs" externalConsole="True" />
+        <Command type="BeforeBuild" command="mono System/Coco.exe Expressions.ATG -namespace Expressions -o System -frames System" externalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="BinaryOperation.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="FunctionCall.cs" />
+    <Compile Include="FunctionDefinition.cs" />
+    <Compile Include="Operator.cs" />
+    <Compile Include="UnaryOperation.cs" />
+    <Compile Include="Variable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\Call.cs" />
+    <Compile Include="System\CompilationEnvironment.cs" />
+    <Compile Include="System\CstI.cs" />
+    <Compile Include="System\Expression.cs" />
+    <Compile Include="System\FunctionEnvironment.cs" />
+    <Compile Include="System\Generator.cs" />
+    <Compile Include="System\Goto.cs" />
+    <Compile Include="System\IfNotZero.cs" />
+    <Compile Include="System\IfZero.cs" />
+    <Compile Include="System\IncSp.cs" />
+    <Compile Include="System\Instruction.cs" />
+    <Compile Include="System\IntegerArgumentInstruction.cs" />
+    <Compile Include="System\JumpInstruction.cs" />
+    <Compile Include="System\Label.cs" />
+    <Compile Include="System\MainProgram.cs" />
+    <Compile Include="System\Opcode.cs" />
+    <Compile Include="System\Parser.cs" />
+    <Compile Include="System\PrimitiveType.cs" />
+    <Compile Include="System\Program.cs" />
+    <Compile Include="System\Return.cs" />
+    <Compile Include="System\RuntimeEnvironment.cs" />
+    <Compile Include="System\Scanner.cs" />
+    <Compile Include="System\SimpleInstruction.cs" />
+    <Compile Include="System\Storage.cs" />
+    <Compile Include="System\TCall.cs" />
+    <Compile Include="System\Type.cs" />
+    <Compile Include="System\TypeCheckingEnvironment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Expressions.ATG" />
+  </ItemGroup>
+</Project>

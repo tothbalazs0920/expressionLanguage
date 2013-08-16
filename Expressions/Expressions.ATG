@@ -1,0 +1,196 @@
+/* Coco/R lexer and parser specification for arithmetic expressions. */
+/* 2006-09-14 */
+/* Modified 2012-11-06 */
+
+/* Build with:
+ *   Coco.exe -namespace Expressions Expressions.ATG
+ */
+
+using System.Collections.Generic;
+using ListFormalArgs = System.Collections.Generic.List<System.Tuple<System.String, Expressions.Type>>;
+using ListExpr = System.Collections.Generic.List<Expressions.Expression>;
+
+
+COMPILER Expressions
+  public Program program;
+
+/*--------------------------------------------------------------------------*/
+CHARACTERS
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  digit = "0123456789".
+  cr  = '\r'.
+  lf  = '\n'.
+  tab = '\t'.
+
+TOKENS
+  ident  = letter {letter | digit}.
+  number = digit {digit}.
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS  //Balazs
+
+/*------------------------------------------------------------------------*/
+Program<out Program p>     (. p = null; FunctionDefinition f = null; string name = null; Expression e = null;
+                                   Dictionary<string, FunctionDefinition> functions = new Dictionary<string, FunctionDefinition>(); .)
+= {
+	FunctionDefinition<out f, out name>  (. functions.Add(name, f); .)
+   }
+   Expr<out e> (. p = new Program(functions, e); .)
+.
+
+
+FunctionDefinition<out FunctionDefinition f, out string name>  (. f = null; Expression e = null; ListFormalArgs list;
+                                                                   ListFormalArgs argList = new List<Tuple<string, Type>>();
+                                                                   Type rt = null;.)
+= TypeExpr<out rt> Ident<out name> '(' 
+      [
+       FormalArgs<out list>           (. argList = list; .)
+      ]
+      ')' '='
+       Expr<out e>  ';'                                           (. f = new FunctionDefinition(rt, name, argList, e); .)
+.
+
+/*------------------------------------------------------------------------*/
+
+FormalArgs<out ListFormalArgs list> (. Type at; String an;  .)
+= TypeExpr<out at> Ident<out an>               (. list = new List<Tuple<string, Type>>(); 
+                                                  list.Add(new Tuple<string, Type>(an, at)); .)
+  
+{
+      ',' TypeExpr<out at> Ident<out an>                (. list.Add(new Tuple<string, Type>(an, at)); .)
+  }
+
+.
+
+
+
+TypeExpr<out Type t>  (. t = null; .)
+= "int"    (. t = Type.IntegerType; .)
+| "bool"  (. t = Type.BooleanType; .)
+.
+
+Expr<out Expression e>  (. Expression e1,  e2, e3; e = null; .)
+= "if" Expr<out e1> 
+  "then" Expr<out e2> 
+  "else" Expr<out e3>       (. e = new IfStatement(e1, e2, e3);  .)
+  | LogExpr<out e1>   (. e = e1; .)
+.
+
+
+/*------------------------------------------------------------------------*/
+LogExpr<out Expression e>     (. Expression e1, e2; Operator op; e = null; .)
+= BoolTerm<out e1>          (. e = e1; .)
+  { AndOp<out op>        
+    BoolTerm<out e2>        (. e = new BinaryOperation(op, e, e2); .)
+  }
+.
+
+AndOp<out Operator op>  (. op = Operator.Bad; .)
+= '&'    (. op = Operator.And; .)
+.
+
+/*------------------------------------------------------------------------*/
+
+BoolTerm<out Expression e>     (. Expression e1, e2; Operator op; e = null; .)
+= SimBoolExpr<out e1>          (. e = e1; .)
+  { OrOp<out op>        
+    SimBoolExpr<out e2>        (. e = new BinaryOperation(op, e, e2); .)
+  }
+.
+
+OrOp<out Operator op>  (. op = Operator.Bad; .)
+= '|'    (. op = Operator.Or; .)
+.
+
+/*------------------------------------------------------------------------*/
+SimBoolExpr<out Expression e>     (. Expression e1, e2; Operator op; e = null; .)
+= LetIn<out e1>          (. e = e1; .)
+  [ RelOp<out op>        
+    LetIn<out e2>        (. e = new BinaryOperation(op, e, e2); .)
+  ]
+.
+
+LetIn<out Expression e>   (. Expression e1, e2; e = null; String name;   .)
+="let" Ident<out name>
+'=' Expr<out e1>
+"in" Expr<out e2>                                      
+"end" (. e = new LetIn(name, e1, e2); .)
+| SimExpr<out e1>   (. e = e1; .)
+.
+
+/*------------------------------------------------------------------------*/
+SimExpr<out Expression e>  (. Expression e1, e2; Operator op; .)
+= Term<out e1>             (. e = e1; .)
+  { AddOp<out op>
+    Term<out e2>           (. e = new BinaryOperation(op, e, e2); .)
+	}
+.
+
+/*------------------------------------------------------------------------*/
+RelOp<out Operator op>     (. op = Operator.Bad; .)
+= ( "=="                   (. op = Operator.Eq;  .)
+  | "!="                   (. op = Operator.Ne;  .)
+  | "<"                    (. op = Operator.Lt;  .)
+  | "<="                   (. op = Operator.Le;  .)
+  | ">"                    (. op = Operator.Gt;  .)
+  | ">="                   (. op = Operator.Ge;  .)
+  )
+.
+
+/*------------------------------------------------------------------------*/
+Term<out Expression e>     (. Operator op; Expression e1, e2; .)
+= Factor<out e1>           (. e = e1;                         .)
+  { MulOp<out op>
+    Factor<out e2>         (. e = new BinaryOperation(op, e, e2);       .)
+	}
+.
+
+/*------------------------------------------------------------------------*/
+AddOp<out Operator op>     (. op = Operator.Bad; .)
+= ( '+'                    (. op = Operator.Add; .)
+  | '-'                    (. op = Operator.Sub; .)
+  )
+.
+
+
+Factor<out Expression e>   (. string name; Expression e1; e = null; ListExpr list = new List<Expression>(); .)
+= ( Ident<out name>             (. e = new Variable(name); .)
+     [ 
+        '(' FormalExpr<out list> ')' (. e = new FunctionCall(name, list); .)
+     ]
+  | number                 (. e = new Constant(Convert.ToInt32(t.val), 
+                                               Type.IntegerType); .)
+  | '-' Factor<out e1>     (. e = new UnaryOperation(Operator.Neg, e1); .)
+  | '(' Expr<out e1> ')'   (. e = e1; .)
+  )
+.
+/*------------------------------------------------------------------------*/
+
+FormalExpr<out ListExpr list> (.  list = null; Expression e1 = null;  Expression e2 = null; .)
+= Expr<out e1>            (. list = new List<Expression>(); list.Add(e1); .)
+  {
+      ',' Expr<out e2>                (. list.Add(e2); .)
+  }
+
+.
+
+
+/*------------------------------------------------------------------------*/
+MulOp<out Operator op>     (. op = Operator.Bad; .) 
+= ( '*'                    (. op = Operator.Mul; .)
+  | '/'                    (. op = Operator.Div; .)
+  | '%'                     (. op = Operator.Mod; .)
+  )
+.
+
+/*------------------------------------------------------------------------*/
+Ident<out string name>
+= ident                    (. name = t.val; .)
+.
+
+/*------------------------------------------------------------------------*/
+Expressions                (. Program p; .)
+= Program<out p>              (. program = p; .)
+.
+END Expressions.

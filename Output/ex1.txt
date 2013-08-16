@@ -1,0 +1,3 @@
+int succ(int x) = x+1;
+int addTwo(int y) = succ(succ(y));
+addTwo(1)
